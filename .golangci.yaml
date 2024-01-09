@@ -1,0 +1,73 @@
+run:
+  # default concurrency is a available CPU number
+  concurrency: 4
+
+  # timeout for analysis, e.g. 30s, 5m, default is 1m
+  deadline: 1m
+
+  # include test files or not, default is true
+  tests: true
+
+linters:
+  fast: false
+  enable-all: true
+  disable:
+    # TODO Enforce the below linters later
+    - nosnakecase
+    - musttag
+    - dupl
+    - errcheck
+    - funlen
+    - gochecknoglobals
+    - gochecknoinits
+    - gocyclo
+    - gocognit
+    - godox
+    - interfacer
+    - lll
+    - maligned
+    - scopelint
+    - unparam
+    - wsl
+    - gomnd
+    - testpackage
+    - goerr113
+    - nestif
+    - nlreturn
+    - exhaustive
+    - exhaustruct
+    - noctx
+    - gci
+    - golint
+    - tparallel
+    - paralleltest
+    - wrapcheck
+    - tagliatelle
+    - ireturn
+    - exhaustivestruct
+    - errchkjson
+    - contextcheck
+    - gomoddirectives
+    - godot
+    - cyclop
+    - varnamelen
+    - errorlint
+    - forcetypeassert
+    - ifshort
+    - maintidx
+    - nilnil
+    - predeclared
+    - tenv
+    - thelper
+    - wastedassign
+    - containedctx
+    - gosimple
+    - nonamedreturns
+    - asasalint
+    - rowserrcheck
+    - sqlclosecheck
+    - structcheck
+    - varcheck
+    - deadcode
+    - inamedparam
+    - tagalign
