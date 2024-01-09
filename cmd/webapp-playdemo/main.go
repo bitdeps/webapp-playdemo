@@ -9,9 +9,13 @@ import (
 )
 
 func main() {
-	log.Printf("Web app running on localhost:3000\n")
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "3000"
+	}
 
 	logger := log.New(os.Stdout, "webapp ", log.LstdFlags)
+	logger.Printf("Web app running on *:%s\n", port)
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		logger.Printf("Request received for: %s\n", r.URL.Path)
@@ -19,7 +23,7 @@ func main() {
 	})
 
 	server := &http.Server{
-		Addr:              ":3000",
+		Addr:              ":" + port,
 		ReadHeaderTimeout: 3 * time.Second,
 	}
 
