@@ -1,0 +1,77 @@
+name: Release
+on:
+  pull_request:
+    types: [opened, synchronize, closed]
+    branches:
+      - main
+
+jobs:
+  release:
+    name: Create GitHub release
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    outputs:
+      new_tag: ${{ steps.tag.outputs.new_tag }}
+
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Bump version and push tag
+        id: tag
+        uses: mathieudutour/github-tag-action@v6.1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          default_bump: patch
+
+      - uses: actions/setup-go@v4
+
+      - name: Fetch the newly created tag
+        run: git fetch origin tag ${{ steps.tag.outputs.new_tag }} --no-tags
+
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v5
+        env:
+          GORELEASER_CURRENT_TAG: ${{ steps.tag.outputs.new_tag }}
+          GORELEASER_PREVIOUS_TAG: ${{ steps.tag.outputs.previous_tag }}
+        with:
+          distribution: goreleaser
+          args: release
+
+      # When released remove [release: pending] label for the previous PR
+      - name: "Remove [release: pending] label"
+        run: |
+          # merge commit -> merge commit -> sha
+          sha=$(git rev-list HEAD | sed -n '3p')
+          read -r prID <<< "$(gh search prs commit:$sha --json number --jq '.[] | .number' | head -n1)"
+          echo $prID
+          [ -z "$prID" ] || gh pr edit "$prID" --remove-label "release: pending"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  build:
+    name: Build the container image
+    needs: [release]
+    uses: ./.github/workflows/build-image.yaml
+    secrets: inherit
+    with:
+      app: webapp-playdemo/prod
+      artifactName: dist
+      artifactPath: dist/
+      tags: |
+        type=semver,pattern=v{{version}},value=${{ needs.release.outputs.new_tag }}
+        type=semver,pattern=v{{major}}.{{minor}},value=${{ needs.release.outputs.new_tag }}
+
+      yqEval: |-
+        .image.tag = \"${{ needs.release.outputs.new_tag }}\"

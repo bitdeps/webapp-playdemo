@@ -1,0 +1,8 @@
+builds:
+  - main: ./cmd/webapp-playdemo
+    goarch:
+      - amd64
+    goos:
+      - linux
+    env:
+      - CGO_ENABLED=0
