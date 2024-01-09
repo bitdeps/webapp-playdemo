@@ -50,7 +50,6 @@ jobs:
           distribution: goreleaser
           args: release
 
-      # When released remove [release: pending] label for the previous PR
       - name: "Remove [release: pending] label"
         run: |
           # merge commit -> merge commit -> sha
