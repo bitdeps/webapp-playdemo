@@ -8,8 +8,10 @@ import (
 	"time"
 )
 
+// LISTEN=192.168.1.10
 func main() {
 	port := os.Getenv("PORT")
+	listenAddr := os.Getenv("LISTEN_ADDR")
 	if port == "" {
 		port = "3000"
 	}
@@ -23,7 +25,7 @@ func main() {
 	})
 
 	server := &http.Server{
-		Addr:              ":" + port,
+		Addr:              listenAddr + ":" + port,
 		ReadHeaderTimeout: 3 * time.Second,
 	}
 

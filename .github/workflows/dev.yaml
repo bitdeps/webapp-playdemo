@@ -66,6 +66,10 @@ jobs:
     needs: [prerelease]
     uses: ./.github/workflows/build-image.yaml
     secrets: inherit
+    if: |
+      always() &&
+      needs.prerelease.result == 'success'
+
     with:
       app: webapp-playdemo/dev
       tags: ${{ needs.prerelease.outputs.new_tag }}
